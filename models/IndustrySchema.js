@@ -6,12 +6,20 @@ const solutionPackageSchema = new Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+    required: false,
+  },
 });
 
 const solutionSchema = new Schema({
   name: {
     type: String,
     required: true,
+  },
+  image: {
+    type: String,
+    required: false,
   },
   solutionPackage: [solutionPackageSchema],
 });
@@ -21,8 +29,13 @@ const industrySchema = new Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+    required: false,
+  },
   solutions: [solutionSchema],
 });
-const Industry = mongoose.model("industry", industrySchema);
+
+const Industry = mongoose.model("Industry", industrySchema);
 
 module.exports = Industry;

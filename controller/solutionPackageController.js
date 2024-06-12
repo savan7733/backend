@@ -1,21 +1,33 @@
 const Industry = require("../models/IndustrySchema");
+const upload = require("../middleware/upload");
+
 const addSolutionPackage = async (req, res) => {
-  const { industryId, solutionId, newPackageData } = req.body;
-  try {
-    await Industry.updateOne(
-      { _id: industryId, "solutions._id": solutionId },
-      { $push: { "solutions.$.solutionPackage": newPackageData } }
-    );
-    res.status(200).json({
-      success: true,
-      data: "added successfully",
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: err.message,
-    });
-  }
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err });
+    } else {
+      const { industryId, solutionId, name } = req.body;
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
+      const newPackageData = { name, image };
+
+      try {
+        await Industry.updateOne(
+          { _id: industryId, "solutions._id": solutionId },
+          { $push: { "solutions.$.solutionPackage": newPackageData } }
+        );
+        res.status(200).json({
+          success: true,
+          data: "added successfully",
+        });
+      } catch (error) {
+        console.error("Error adding solution package", error);
+        res.status(500).json({
+          success: false,
+          error: "Internal Server Error",
+        });
+      }
+    }
+  });
 };
 
 const getSolutionPackagesBySolutionId = async (req, res) => {
@@ -29,10 +41,7 @@ const getSolutionPackagesBySolutionId = async (req, res) => {
       });
     }
 
-    // Find the solution within the industry
-    const solution = industry.solutions.find(
-      (sol) => sol._id.toString() === solutionId
-    );
+    const solution = industry.solutions.id(solutionId);
     if (!solution) {
       return res.status(404).json({
         success: false,
@@ -40,7 +49,6 @@ const getSolutionPackagesBySolutionId = async (req, res) => {
       });
     }
 
-    // Return the solution packages of the found solution
     res.status(200).json({
       success: true,
       data: solution.solutionPackage,
@@ -52,4 +60,5 @@ const getSolutionPackagesBySolutionId = async (req, res) => {
     });
   }
 };
+
 module.exports = { addSolutionPackage, getSolutionPackagesBySolutionId };

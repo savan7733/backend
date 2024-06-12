@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 dotenv.config();
 connectDB();
-// addDefaultSampleData();
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api/industries", industryRoute);
 app.use("/api/solutions", solutionRoute);

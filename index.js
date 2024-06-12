@@ -8,7 +8,6 @@ const addSolution = async (req, res) => {
       return res.status(400).json({ success: false, error: err });
     } else {
       const { industryId, name } = req.body;
-      console.log("///////////IndustryId/////////", industryId);
       const image = req.file ? `/uploads/${req.file.filename}` : null;
       const newSolutionData = { name, image };
       console.log("=========newSolutionData==============", newSolutionData);
