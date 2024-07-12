@@ -33,4 +33,24 @@ const addSolution = async (req, res) => {
   });
 };
 
-module.exports = { addSolution };
+const deleteSolution = async (req, res) => {
+  const { industryId, solutionId } = req.body;
+  try {
+    const data = await Industry.updateOne(
+      { _id: industryId },
+      { $pull: { solutions: { _id: solutionId } } }
+    );
+    console.log("data after delete", data);
+    res.status(200).json({
+      success: true,
+      data: "deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting solution", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
+};
+module.exports = { addSolution, deleteSolution };

@@ -30,6 +30,35 @@ const addSolutionPackage = async (req, res) => {
   });
 };
 
+const deleteSolutionPackage = async (req, res) => {
+  const { industryId, solutionId, packageId } = req.body;
+  console.log("delete solution package", industryId, solutionId, packageId);
+  try {
+    const industry = await Industry.updateOne(
+      { _id: industryId, "solutions._id": solutionId },
+      { $pull: { "solutions.$.solutionPackage": { _id: packageId } } }
+    );
+
+    if (industry.nModified === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Solution package not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: "Deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting solution package", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
+};
+
 const getSolutionPackagesBySolutionId = async (req, res) => {
   const { industryId, solutionId } = req.params;
   try {
@@ -61,4 +90,8 @@ const getSolutionPackagesBySolutionId = async (req, res) => {
   }
 };
 
-module.exports = { addSolutionPackage, getSolutionPackagesBySolutionId };
+module.exports = {
+  addSolutionPackage,
+  getSolutionPackagesBySolutionId,
+  deleteSolutionPackage,
+};
